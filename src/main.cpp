@@ -98,7 +98,6 @@ void setLedColorHSV(int h, double s, double v) {
   int blue=constrain((int)255*b,0,255);
   setLedColor(red,green,blue);}
 
-
 void staticColor(float pot, int red, int green, int blue, bool syn) {
   if (syn) {
     synNumber = (0.5*sin(radians(degr)/(pot * 20)) + 0.5);
@@ -114,8 +113,6 @@ void staticColor(float pot, int red, int green, int blue, bool syn) {
     analogWrite(blue_pin, ceil(blue*pot));
   }
 }
-
-
 
 void loop() {
 // протокол В.1
@@ -270,16 +267,6 @@ void loop() {
       // }
       
 
-
-
-  
-  
-
-
-
-
-      
-  
   // int butt = !digitalRead(butt_pin);
   // if (butt == 1 && flag == 0) {
   //   flag = 1;
