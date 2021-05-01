@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
+
 #include <avr/eeprom.h>
 
 #define red_pin  11
@@ -19,9 +20,9 @@ byte  data[10];
  
 
 byte count = 0; 
-byte rgbParams[5];
 
 
+char* offset;
 float synNumber;
 
 bool connected = false;
@@ -35,7 +36,7 @@ void setup() {
   pinMode(blue_pin, OUTPUT); 
   Serial.setTimeout(1000);
   for (byte i = 0; i <= 4; i++ ) {
-      rgbParams[i] = eeprom_read_byte(i);
+      data[i] = eeprom_read_byte(i);    
    }
   }
 
@@ -98,10 +99,9 @@ void setLedColorHSV(int h, double s, double v) {
 
 void staticColor(float pot, int red, int green, int blue, bool syn) {
   if (syn) {
-    synNumber = (0.5*sin(radians(degr)/(pot * 20)) + 0.5);
+    synNumber = (0.5*sin(radians(degr)/(pot * 2)) + 0.5);
     delay(1);
     degr++;  
-    
     analogWrite(red_pin, floor(red*synNumber));
     analogWrite(green_pin, floor(green*synNumber));
     analogWrite(blue_pin, floor(blue*synNumber));
@@ -140,7 +140,7 @@ void loop() {
     staticColor(data[1], data[2], data[3], data[4], false);
   } else if (data[0] == 2) {
     //Color wheel mode
-    if (millis() - myTimer1 >= data[1] * 100) { 
+    if (millis() - myTimer1 >= data[1] * 5) { 
       myTimer1 = millis();
       if (hue == 359) {
         hue = 0;}   
@@ -150,7 +150,7 @@ void loop() {
     // if "in Mode" != (0-2) , LED strip will got red
     analogWrite(red_pin, 255); 
     analogWrite(green_pin, 0);
-    analogWrite(blue_pin, 0);
+    analogWrite(blue_pin, 10);
   }
 
 
