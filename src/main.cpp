@@ -12,20 +12,14 @@ int hue;
 uint32_t myTimer1;
 float pot;
 
-String inChar;
-int inMode;
+char str[20];    
+int amount;
 
-String inRed;
-int inRedInt;
+byte  data[10];
+byte count = 0; 
+byte rgbParams[5];
 
-String inGreen;
-int inGreenInt;
 
-String inBlue;
-int inBlueInt;
-
-String inPwm;
-int inPwm2;
 float synNumber;
 
 bool connected = false;
@@ -33,12 +27,14 @@ int inTest;
 
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(1000000);
   pinMode(red_pin, OUTPUT);
   pinMode(green_pin, OUTPUT);
   pinMode(blue_pin, OUTPUT); 
-  Serial.setTimeout(5);
-  
+  Serial.setTimeout(1000);
+  for (byte i = 0; i <= 4; i++ ) {
+      rgbParams[i] = eeprom_read_byte(i);
+   }
   }
 
 void setLedColor(int red, int green, int blue) {
@@ -124,7 +120,7 @@ void loop() {
 // 5. Blue color(0-255) 
 
 // протокол В.2
-// 0|100|255|255|255 (0,100,255,255,255) в другуій версій протоколу позбавимось від "String" 
+// 0|100|255|255|255 (0,100,255,255,255;) в другуій версій протоколу позбавимось від "String" 
 // комми між значеннями дозволять більш зручно парсити дані без використання особливостей "String"
 // Це заощадить пам'ять, що в майбутньому дозволить вигідно записувати дані в EEPROM  
 
@@ -134,7 +130,6 @@ void loop() {
     staticColor(pot, inRedInt, inGreenInt, inBlueInt, true); 
   } else if (inMode == 1) {
     //Static color mode
-    
     staticColor(pot, inRedInt, inGreenInt, inBlueInt, false);
   } else if (inMode == 2) {
     //Color wheel mode
@@ -152,36 +147,32 @@ void loop() {
   }
 
 
-  if (Serial.available() > 0) {
-    inChar = Serial.readString();
-
+  if (Serial.available() > 2) {
+    amount = Serial.readBytesUntil(';', str, 20);   
     if (!connected) {
-      inTest = String(inChar).toInt();
-      if (inTest == 1229) {
-        delay(2000);
+      if (str[0] == 'a') {
+        delay(500);
         Serial.write('1');
         connected = true;
-    }}
-    
-
-    inMode = String(inChar[0]).toInt();
-
-    inPwm = String(inChar[1]) + String(inChar[2]) + String(inChar[3]);
-    inPwm2 = inPwm.toInt();
-
-    inRed = String(inChar[4]) + String(inChar[5]) + String(inChar[6]); 
-    inRedInt = inRed.toInt();
-
-    inGreen = String(inChar[7]) + String(inChar[8]) + String(inChar[9]);
-    inGreenInt = inGreen.toInt();
-
-    inBlue = String(inChar[10]) + String(inChar[11]) + String(inChar[12]);
-    inBlueInt = inBlue.toInt();
-
-    pot = inPwm2 / 100.0;
-    
+      }
     }
-    }
+    
+    str[amount] = NULL;    
+    offset = str; 
+    byte count = 0;
+
+    while (true) { 
+      data[count++] = atoi(offset);   
+      offset = strchr(offset, ','); 
+      if (offset) offset++;
+      else break;
+    } 
+    
+    for (byte i = 0; i <= count; i++ ) {
+      eeprom_write_byte(i, data[i]);
+    }    
+  }
+}
     
 
     // if (inMode == 0) {
