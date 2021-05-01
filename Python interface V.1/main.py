@@ -45,7 +45,7 @@ def serial_ports():
 def connecting(port_index):
     global aviable_ports, ser, btn3
     serial_loop_counter = 0
-    ser = serial.Serial(aviable_ports[port_index], 9600)  # open serial port
+    ser = serial.Serial(aviable_ports[port_index], 1000000)  # open serial port
     ser.timeout = 1
     print(aviable_ports[port_index])
     while serial_loop_counter != 15:
