@@ -10,12 +10,14 @@
 long degr;
 int hue;
 uint32_t myTimer1;
-float pot;
+
 
 char str[20];    
 int amount;
 
 byte  data[10];
+ 
+
 byte count = 0; 
 byte rgbParams[5];
 
@@ -124,16 +126,21 @@ void loop() {
 // комми між значеннями дозволять більш зручно парсити дані без використання особливостей "String"
 // Це заощадить пам'ять, що в майбутньому дозволить вигідно записувати дані в EEPROM  
 
+// data[0] == key   (0-2)
+// data[1] == pot   (0-100)
+// data[2] == red   (0-255)
+// data[3] == green (0-255)
+// data[4] == blue  (0-255)
 
-  if (inMode == 0) {
+  if (data[0] == 0) {
     //Breath mode
-    staticColor(pot, inRedInt, inGreenInt, inBlueInt, true); 
-  } else if (inMode == 1) {
+    staticColor(data[1], data[2], data[3], data[4], true); 
+  } else if (data[0] == 1) {
     //Static color mode
-    staticColor(pot, inRedInt, inGreenInt, inBlueInt, false);
-  } else if (inMode == 2) {
+    staticColor(data[1], data[2], data[3], data[4], false);
+  } else if (data[0] == 2) {
     //Color wheel mode
-    if (millis() - myTimer1 >= pot * 100) { 
+    if (millis() - myTimer1 >= data[1] * 100) { 
       myTimer1 = millis();
       if (hue == 359) {
         hue = 0;}   
