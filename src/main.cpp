@@ -99,7 +99,7 @@ void setLedColorHSV(int h, double s, double v) {
 
 void staticColor(float pot, int red, int green, int blue, bool syn) {
   if (syn) {
-    synNumber = (0.5*sin(radians(degr)/(pot * 2)) + 0.5);
+    synNumber = (0.5*sin(radians(degr)/(pot * 20)) + 0.5);
     delay(1);
     degr++;  
     analogWrite(red_pin, floor(red*synNumber));
@@ -134,10 +134,10 @@ void loop() {
 
   if (data[0] == 0) {
     //Breath mode
-    staticColor(data[1], data[2], data[3], data[4], true); 
+    staticColor(data[1]/100, data[2], data[3], data[4], true); 
   } else if (data[0] == 1) {
     //Static color mode
-    staticColor(data[1], data[2], data[3], data[4], false);
+    staticColor(data[1]/100, data[2], data[3], data[4], false);
   } else if (data[0] == 2) {
     //Color wheel mode
     if (millis() - myTimer1 >= data[1] * 5) { 
