@@ -50,84 +50,45 @@ def connecting(port_index):
     print(aviable_ports[port_index])
     while serial_loop_counter != 15:
         try:
-            ser.write(b'1229')
+            ser.write(b'a')
             time.sleep(0.3)
             arduino_serial_answer = ser.readline().decode('ascii')
             print(arduino_serial_answer)
             if arduino_serial_answer == '1':
-                print("good")
                 btn3.configure(bg="green", text="Connected", fg="white")
                 break
-            else:
-                print("bad")
             serial_loop_counter += 1
             time.sleep(0.3)
         except Exception as e:
-            print("Serial error")
+            messagebox.showerror("Error", e)
             btn3.configure(bg="red")
-            print(e)
             serial_loop_counter += 1
     
     
-color = None
-been_clicked = False
 drop_down = None
 
 def radio_clicked():
-    global color, been_clicked
+    global been_clicked
     
-    if been_clicked or selected.get() == 2:
-        if selected.get() == 2:
-            mode = str(selected.get())
-            slider = str(slider_selected.get())
-            if len(slider) != 3:
-                slider = '0'*(3-len(slider)) + slider
-            print(mode + slider)
-            i = mode + slider
+    if selected.get() == 2:       
+        mode = str(selected.get())
+        slider = str(slider_selected.get())
+        i = mode + "," + slider + ";"
+        ser.write(i.encode())
+        time.sleep(0.3)
+    else:     
+        mode = str(selected.get())
+        slider = str(slider_selected.get())
+        color_code = colorchooser.askcolor(title ="Choose color")
+        if color_code[0] is None:
+            return
+        else:
+            i = mode + "," + slider + "," + str(color_code[0][0]) + "," + str(color_code[0][1]) + "," + str(color_code[0][2]) + ";"
             ser.write(i.encode())
             time.sleep(0.3)
-            
-
-        else:     
-            mode = str(selected.get())
-            slider = str(slider_selected.get())
-            if len(slider) != 3:
-                slider = '0'*(3-len(slider)) + slider
-            print(mode + slider + color)
-            i = mode + slider + color
-            ser.write(i.encode())
-            time.sleep(0.3)
-    else:
-        messagebox.showerror("Title", "Firstly choise LED color")
-
-    
     
 
-def choose_color():
-    global color, been_clicked
-    # variable to store hexadecimal code of color
-    color_code = colorchooser.askcolor(title ="Choose color")
     
-    
-
-    if color_code[0] is None:
-        pass   
-    else:
-        red = str(int(color_code[0][0]))
-        if len(red) != 3:
-            red = '0'*(3- len(red)) + red
-
-        green = str(int(color_code[0][1]))
-        if len(green) != 3:
-            green = '0'*(3- len(green)) + green
-
-        blue = str(int(color_code[0][2]))
-        if len(blue) != 3:
-            blue = '0'*(3- len(blue)) + blue
-
-        color = red + green + blue
-        been_clicked = True   
-
 def connect_button():
     global drop_down
     print(drop_down.current())
@@ -149,23 +110,17 @@ try:
 except:
     drop_down.current(0)
 btn = Button(window, text="click", command=radio_clicked)
-btn2 = Button(window, text="color", command=choose_color)
 btn3 = Button(window, text="Connect", command=connect_button)
-
 w = Scale(window, from_=0, to=100, orient=HORIZONTAL, variable=slider_selected)
   
-
 w.grid(column=1, row=6)
-
 btn.grid(column=1, row=7)
-btn2.grid(column=1, row=8)
 btn3.grid(column=1, row = 0)
-
 rad1.grid(column=0, row=4)  
 rad2.grid(column=1, row=4)  
 rad3.grid(column=2, row=4) 
-
 drop_down.grid(column = 0, row=0)
+
 window.mainloop()
 
 # ser = serial.Serial('COM9', 9600)  # open serial port
