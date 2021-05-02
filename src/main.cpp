@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 
+
 #include <avr/eeprom.h>
 
 #define red_pin  11
@@ -132,35 +133,37 @@ void loop() {
 // data[3] == green (0-255)
 // data[4] == blue  (0-255)
 
-  if (data[0] == 0) {
-    //Breath mode
-    staticColor(data[1]/100, data[2], data[3], data[4], true); 
-  } else if (data[0] == 1) {
-    //Static color mode
-    staticColor(data[1]/100, data[2], data[3], data[4], false);
-  } else if (data[0] == 2) {
-    //Color wheel mode
-    if (millis() - myTimer1 >= data[1] * 5) { 
-      myTimer1 = millis();
-      if (hue == 359) {
-        hue = 0;}   
-      setLedColorHSV(hue,1,1);
-      hue++;}
-  } else {
-    // if "in Mode" != (0-2) , LED strip will got red
-    analogWrite(red_pin, 255); 
-    analogWrite(green_pin, 0);
-    analogWrite(blue_pin, 10);
-  }
+  //  if (data[0] == 0) {
+  //    //Breath mode
+  //    staticColor(data[1]/100, data[2], data[3], data[4], true); 
+  //  } else if (data[0] == 1) {
+  //    //Static color mode
+  //    staticColor(data[1]/100, data[2], data[3], data[4], false);
+  //  } else if (data[0] == 2) {
+  //    //Color wheel mode
+  //    if (millis() - myTimer1 >= data[1] * 5) { 
+  //      myTimer1 = millis();
+  //      if (hue == 359) {
+  //        hue = 0;}   
+  //      setLedColorHSV(hue,1,1);
+  //      hue++;}
+  //  } else {
+  //    // if "in Mode" != (0-2) , LED strip will got red
+  //    analogWrite(red_pin, 255); 
+  //    analogWrite(green_pin, 0);
+  //    analogWrite(blue_pin, 10);
+  //  }
 
 
   if (Serial.available() > 2) {
     amount = Serial.readBytesUntil(';', str, 20);   
+  
     if (!connected) {
       if (str[0] == 'a') {
         delay(500);
         Serial.write('1');
         connected = true;
+       
       }
     }
     
@@ -174,10 +177,13 @@ void loop() {
       if (offset) offset++;
       else break;
     } 
-    
-    for (byte i = 0; i <= count; i++ ) {
-      eeprom_write_byte(i, data[i]);
-    }    
+    analogWrite(red_pin, data[2]);
+    analogWrite(green_pin, data[3]);
+    analogWrite(blue_pin,data[4]);
+
+     for (byte i = 0; i <= count; i++ ) {
+       eeprom_write_byte(i, data[i]);
+     }    
   }
 }
     
@@ -339,4 +345,3 @@ void loop() {
   //   analogWrite(red_pin, x);
   //   analogWrite(green_pin, x);
   //   analogWrite(blue_pin, x);}}
-
