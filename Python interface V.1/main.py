@@ -47,18 +47,18 @@ def connecting(port_index):
     serial_loop_counter = 0
     ser = serial.Serial(aviable_ports[port_index], 1000000)  # open serial port
     ser.timeout = 1
-    print(aviable_ports[port_index])
+    
     while serial_loop_counter != 15:
         try:
-            ser.write(b'a')
-            time.sleep(0.3)
+            ser.write(b'a;')
+            time.sleep(0.1)
             arduino_serial_answer = ser.readline().decode('ascii')
             print(arduino_serial_answer)
             if arduino_serial_answer == '1':
                 btn3.configure(bg="green", text="Connected", fg="white")
                 break
             serial_loop_counter += 1
-            time.sleep(0.3)
+            time.sleep(0.1)
         except Exception as e:
             messagebox.showerror("Error", e)
             btn3.configure(bg="red")
@@ -66,6 +66,7 @@ def connecting(port_index):
     
     
 drop_down = None
+data = ['255', '0', '255']
 
 def radio_clicked():
     global been_clicked
@@ -86,12 +87,29 @@ def radio_clicked():
             i = mode + "," + slider + "," + str(color_code[0][0]) + "," + str(color_code[0][1]) + "," + str(color_code[0][2]) + ";"
             ser.write(i.encode())
             time.sleep(0.3)
+        asd = True
+        while True:
+            if asd:
+                data[0] = '255'
+                data[1] = '128'   
+                data[2] = '255' 
+                asd = not asd
+            else:
+                data[0] = '255'
+                data[1] = '128'   
+                data[2] = '255' 
+                asd = not asd      
+
+            
+            i = '0' + "," + '100' + "," + data[0] + "," + data[1] + "," + data[2] + ";"  
+            ser.write(i.encode())
+            time.sleep(1)  
+
     
 
     
 def connect_button():
     global drop_down
-    print(drop_down.current())
     connecting(drop_down.current())
       
 window = Tk()
@@ -122,6 +140,29 @@ rad3.grid(column=2, row=4)
 drop_down.grid(column = 0, row=0)
 
 window.mainloop()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # ser = serial.Serial('COM9', 9600)  # open serial port
 # ser.timeout = 1
