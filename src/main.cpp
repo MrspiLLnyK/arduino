@@ -1,34 +1,21 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-
-#include <avr/eeprom.h>
-
 #define red_pin  11
 #define green_pin  9
 #define blue_pin  10
 
-
 long degr;
 int hue;
 uint32_t myTimer1;
-
-
-char str[20];    
+char str[12];    
 int amount;
-
-byte  data[10];
- 
-
+byte  data[3];
 byte count = 0; 
-
-
 char* offset;
 float synNumber;
-
 bool connected = false;
 int inTest;
-
 
 void setup() {
   Serial.begin(1000000);
@@ -36,9 +23,6 @@ void setup() {
   pinMode(green_pin, OUTPUT);
   pinMode(blue_pin, OUTPUT); 
   Serial.setTimeout(1000);
-  for (byte i = 0; i <= 4; i++ ) {
-      data[i] = eeprom_read_byte(i);    
-   }
   }
 
 void setLedColor(int red, int green, int blue) {
@@ -159,11 +143,11 @@ void loop() {
     amount = Serial.readBytesUntil(';', str, 20);   
   
     if (!connected) {
+    Serial.println(str[0]);
       if (str[0] == 'a') {
         delay(500);
         Serial.write('1');
         connected = true;
-       
       }
     }
     
@@ -177,13 +161,10 @@ void loop() {
       if (offset) offset++;
       else break;
     } 
-    analogWrite(red_pin, data[2]);
-    analogWrite(green_pin, data[3]);
-    analogWrite(blue_pin,data[4]);
-
-     for (byte i = 0; i <= count; i++ ) {
-       eeprom_write_byte(i, data[i]);
-     }    
+   
+    analogWrite(red_pin, data[0]);
+    analogWrite(green_pin, data[1]);
+    analogWrite(blue_pin,data[2]);
   }
 }
     
